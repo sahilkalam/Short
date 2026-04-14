@@ -43,7 +43,7 @@ app.get('/s/:id', async (req, res) => {
     const links = await getLinks();
     const link = links.find(l => l.id === req.params.id);
     
-    if (!link) return res.status(404).send("Link Not Found");
+    if (!link) return res.status(404).sendFile(path.join(__dirname, 'public', '404.html')); // Updated to show 404 page
 
     // Randomize process (3 to 5 steps, random wait times)
     const totalSteps = Math.floor(Math.random() * 3) + 3; 
@@ -63,7 +63,9 @@ app.get('/s/:id', async (req, res) => {
 
 // 3. Secure Viewer Page
 app.get('/view/:token', (req, res) => {
-    if (!activeSessions[req.params.token]) return res.status(404).send("Invalid or Expired Session. Go back to original link.");
+    if (!activeSessions[req.params.token]) {
+        return res.status(404).sendFile(path.join(__dirname, 'public', '404.html')); // Updated to show 404 page
+    }
     res.sendFile(path.join(__dirname, 'public', 'viewer.html'));
 });
 
@@ -111,6 +113,13 @@ app.post('/api/next', (req, res) => {
     
     delete activeSessions[token]; // Destroy old token
     res.json({ complete: false, nextUrl: `/view/${nextToken}` });
+});
+
+// ==========================================
+// 6. Catch-all route for 404 Page (UPDATED)
+// ==========================================
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
 app.listen(3000, () => console.log('Secure Server running on http://localhost:3000/create'));
