@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Article...</title>
+    <style>
+        body {
+            user-select: none; /* Text selection disable */
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800" oncontextmenu="return false;">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Fake long articles
+        const articles = [
+            {
+                title: "The Future of Artificial Intelligence in 2026",
+                content: "Artificial Intelligence has drastically changed the landscape of technology. In recent years, we have seen massive advancements in neural networks and machine learning models. Companies are heavily investing in automation to streamline operations. However, this raises ethical concerns regarding job displacement and data privacy. Experts suggest that a balanced approach is necessary, focusing on AI as a tool to augment human capabilities rather than replace them entirely. The next decade will be crucial in defining global AI regulations."
+            },
+            {
+                title: "Top 5 Technologies Revolutionizing Space Travel",
+                content: "Space exploration has entered a new golden age. With reusable rockets developed by private companies, the cost of sending payloads into orbit has plummeted. Furthermore, advancements in ion propulsion and life support systems are making long-duration missions, such as the upcoming manned Mars mission, more feasible. Satellite constellations are also providing high-speed internet to remote areas on Earth, proving that space tech has direct benefits for our daily lives. The global space economy is booming like never before."
+            },
+            {
+                title: "How Renewable Energy is Reshaping the Global Economy",
+                content: "The transition from fossil fuels to renewable energy sources like solar and wind is accelerating. Governments worldwide are setting aggressive carbon-neutral targets. Solar panels have become cheaper and more efficient, while battery storage technology ensures power is available even when the sun isn't shining. This shift is not just environmental; it is an economic revolution creating millions of green jobs. Challenges remain, particularly in updating aging power grids, but the momentum is undeniable."
+            }
+        ];
+
+        function Viewer() {
+            const token = window.location.pathname.split('/').pop();
+            const [status, setStatus] = React.useState(null);
+            const [timer, setTimer] = React.useState(0);
+            const [canProceed, setCanProceed] = React.useState(false);
+            const [article] = React.useState(articles[Math.floor(Math.random() * articles.length)]);
+
+            React.useEffect(() => {
+                // Get status from secure server
+                fetch(`/api/status/${token}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert("Link expired or manipulated!");
+                            return;
+                        }
+                        setStatus(data);
+                        setTimer(data.waitTime);
+                    });
+            }, [token]);
+
+            React.useEffect(() => {
+                if (timer > 0) {
+                    const interval = setInterval(() => setTimer(prev => prev - 1), 1000);
+                    return () => clearInterval(interval);
+                } else if (status) {
+                    setCanProceed(true);
+                }
+            }, [timer, status]);
+
+            const handleNext = async () => {
+                setCanProceed(false); // disable button immediately
+                const res = await fetch('/api/next', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                });
+                
+                const data = await res.json();
+                if (data.error) {
+                    alert(data.error);
+                } else if (data.complete) {
+                    window.location.href = data.url; // Final redirect
+                } else {
+                    window.location.href = data.nextUrl; // Next random step
+                }
+            };
+
+            if (!status) return <div className="text-center mt-20 text-xl font-bold">Loading secure link...</div>;
+
+            return (
+                <div className="max-w-2xl mx-auto p-4 py-8">
+                    {/* Header Tracker */}
+                    <div className="flex justify-between items-center bg-white p-4 rounded shadow-sm border border-gray-200 mb-6">
+                        <span className="font-bold text-gray-500">Security Check: Step {status.step} of {status.total}</span>
+                        {timer > 0 ? (
+                            <span className="text-red-500 font-bold animate-pulse">Wait {timer} seconds...</span>
+                        ) : (
+                            <span className="text-green-600 font-bold">Verification Complete!</span>
+                        )}
+                    </div>
+
+                    {/* Dummy Article */}
+                    <article className="bg-white p-6 md:p-10 rounded-xl shadow-lg border-t-4 border-blue-600 mb-8 select-none">
+                        <h1 className="text-3xl font-extrabold mb-6 text-gray-900 leading-tight">{article.title}</h1>
+                        <p className="text-lg text-gray-700 leading-relaxed mb-6">{article.content}</p>
+                        <p className="text-lg text-gray-700 leading-relaxed mb-6">In conclusion, staying updated with these trends is vital for anyone looking to understand the modern world. Experts advise continuous learning. (Scroll down to continue to your link).</p>
+                    </article>
+
+                    {/* Action Button */}
+                    <button 
+                        disabled={!canProceed}
+                        onClick={handleNext}
+                        className={`w-full py-5 rounded-xl font-extrabold text-lg text-white shadow-md transition-all duration-300 transform 
+                            ${canProceed 
+                                ? 'bg-gradient-to-r from-blue-600 to-blue-800 hover:scale-[1.02] cursor-pointer' 
+                                : 'bg-gray-400 cursor-not-allowed opacity-70'}`}
+                    >
+                        {canProceed ? (status.step >= status.total ? 'GET DESTINATION LINK' : 'CLICK TO CONTINUE TO NEXT STEP') : 'SCROLL & READ (WAITING)'}
+                    </button>
+                </div>
+            );
+        }
+        
+        ReactDOM.createRoot(document.getElementById('root')).render(<Viewer />);
+        
+        // Block Keyboard Shortcuts (Ctrl+C, Ctrl+U)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && (e.key === 'c' || e.key === 'u' || e.key === 's' || e.key === 'i' || e.key === 'p')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
