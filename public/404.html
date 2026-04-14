@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Security Alert</title>
+    <style>
+        body { user-select: none; -webkit-user-select: none; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800" oncontextmenu="return false;">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function ErrorPage() {
+            return (
+                <div className="max-w-2xl mx-auto p-4 py-12 text-center">
+                    {/* Error Header */}
+                    <div className="bg-red-50 border-l-4 border-red-600 p-6 rounded-lg shadow-sm mb-8">
+                        <h1 className="text-6xl font-black text-red-600 mb-2">404</h1>
+                        <p className="text-xl font-bold text-red-800 uppercase tracking-widest">Access Denied / Page Not Found</p>
+                    </div>
+
+                    {/* Dummy Article for Style Consistency */}
+                    <article className="bg-white p-8 md:p-10 rounded-xl shadow-lg border-t-4 border-slate-800 mb-8 text-left">
+                        <h2 className="text-2xl font-bold mb-4 text-gray-900">Security Protocol Log: #ERR_404</h2>
+                        <p className="text-gray-600 leading-relaxed mb-4 italic border-l-2 border-gray-200 pl-4">
+                            "The system was unable to locate the requested resource on this secure server. 
+                            This could be due to an expired session token, a broken link, or a direct access attempt."
+                        </p>
+                        <p className="text-gray-700 leading-relaxed mb-6">
+                            Cybersecurity protocols often involve redirecting users back to a safe entry point when a 
+                            resource is missing. This prevents unauthorized crawlers from mapping the server structure. 
+                            Please use the authenticated button below to return to the home screen.
+                        </p>
+                        <div className="h-px bg-gray-200 w-full mb-6"></div>
+                        <p className="text-sm text-gray-400 font-mono">Timestamp: {new Date().toISOString()}</p>
+                    </article>
+
+                    {/* Action Button */}
+                    <a href="/create" className="inline-block w-full py-4 bg-slate-900 text-white rounded-xl font-bold text-lg hover:bg-slate-800 transition shadow-lg transform hover:scale-[1.01]">
+                        RETURN TO SECURE DASHBOARD
+                    </a>
+                    
+                    <p className="mt-8 text-gray-400 text-xs">
+                        &copy; 2024 Secure Link Protocol. All systems operational.
+                    </p>
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<ErrorPage />);
+
+        // Block shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && (e.key === 'c' || e.key === 'u' || e.key === 'i')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
