@@ -1,0 +1,27 @@
+{
+  "name": "codes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "ejs": "^5.0.1",
+    "express": "^4.22.1",
+    "express-session": "^1.19.0",
+    "node-telegram-bot-api": "^0.61.0",
+    "nodemailer": "^8.0.4",
+    "nodemon": "^2.0.22",
+    "tailwindcss": "^1.9.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon index.js",
+    "dev1":"nodemon bot.js"
+
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
